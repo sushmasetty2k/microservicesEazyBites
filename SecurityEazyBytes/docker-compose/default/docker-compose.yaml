@@ -1,4 +1,16 @@
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.7
+    container_name: keycloak
+    ports:
+      - "127.0.0.1:7080:8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+      KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
+    command: "start-dev"
+    extends:
+      file: common-config.yaml
+      service: network-deploy-service
   read:
     image: grafana/loki:3.6.2
     command: "-config.file=/etc/loki/config.yaml -target=read"
@@ -215,7 +227,7 @@ services:
       service: network-deploy-service
 
   configserver:
-    image: "sushmasetty2k/configserver:s11"
+    image: "sushmasetty2k/configserver:s12"
     container_name: configserver-ms
     ports:
       - "8071:8071"
@@ -232,7 +244,7 @@ services:
       OTEL_SERVICE_NAME: "configserver"
 
   eurekaserver:
-    image: "sushmasetty2k/eurekaserver:s11"
+    image: "sushmasetty2k/eurekaserver:s12"
     container_name: eurekaserver-ms
     ports:
       - "8070:8070"
@@ -253,7 +265,7 @@ services:
       OTEL_SERVICE_NAME: "eurekaserver"
 
   accounts:
-    image: "sushmasetty2k/accounts:s11"
+    image: "sushmasetty2k/accounts:s12"
     container_name: accounts-ms
     ports:
       - "8080:8080"
@@ -276,7 +288,7 @@ services:
       service: microservice-eureka-config
 
   loans:
-    image: "sushmasetty2k/loans:s11"
+    image: "sushmasetty2k/loans:s12"
     container_name: loans-ms
     ports:
       - "8090:8090"
@@ -299,7 +311,7 @@ services:
       service: microservice-eureka-config
 
   cards:
-    image: "sushmasetty2k/cards:s11"
+    image: "sushmasetty2k/cards:s12"
     container_name: cards-ms
     ports:
       - "9000:9000"
@@ -322,7 +334,7 @@ services:
       service: microservice-eureka-config
 
   gatewayserver:
-    image: "sushmasetty2k/gatewayserver:s11"
+    image: "sushmasetty2k/gatewayserver:s12"
     container_name: gatewayserver-ms
     ports:
       - "8072:8072"
@@ -336,6 +348,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
       OTEL_SERVICE_NAME: "gatewayserver"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
     extends:
       file: common-config.yaml
       service: microservice-eureka-config
